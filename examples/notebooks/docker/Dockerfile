@@ -1,6 +1,7 @@
 FROM nbgallery/jupyter-alpine:latest 
 
 RUN pip install git+https://github.com/kubernetes-client/python.git
+RUN pip install pick ppretty
 
 WORKDIR /root/
 
