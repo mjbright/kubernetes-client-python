@@ -8,7 +8,7 @@ spec:
   ports:
   - port: 80
     name: http
-    targetPort: 8888
+    targetPort: 80
   selector:
     app: jupyter
   type: LoadBalancer
@@ -22,15 +22,22 @@ metadata:
 spec:
   containers:
     - name: jupyter
-      image: skippbox/jupyter:0.0.3
+      #image: skippbox/jupyter:0.0.3
+      image: mjbright/skippbox-jupyter:latest
       ports:
-      - containerPort: 8888
+      - containerPort: 80
         protocol: TCP
         name: http
       volumeMounts:
-        - mountPath: /root
+        - mountPath: /root/notebook-volume
           name: notebook-volume
+        - mountPath: /root/.kube
+          name: kube-config
   volumes:
-  - name: notebook-volume
-    gitRepo:
-      repository: "https://github.com/kubernetes-client/python.git"
+    - name: notebook-volume
+      gitRepo:
+        repository: "https://github.com/kubernetes-client/python.git"
+    - name: kube-config
+      hostPath:
+        path: /home/core/.kube
+
