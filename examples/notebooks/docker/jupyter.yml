@@ -36,7 +36,7 @@ spec:
   volumes:
     - name: notebook-volume
       gitRepo:
-        repository: "https://github.com/kubernetes-client/python.git"
+        repository: "https://github.com/mjbright/kubernetes-client-python.git"
     - name: kube-config
       hostPath:
         path: /home/core/.kube
