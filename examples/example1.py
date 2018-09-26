@@ -24,6 +24,11 @@ def main():
     config.load_kube_config()
 
     v1 = client.CoreV1Api()
+
+    print("Listing namespaces:")
+    for ns in v1.list_namespace().items:
+        print(" - " + ns.metadata.name)
+
     print("Listing pods with their IPs:")
     ret = v1.list_pod_for_all_namespaces(watch=False)
     for i in ret.items:
