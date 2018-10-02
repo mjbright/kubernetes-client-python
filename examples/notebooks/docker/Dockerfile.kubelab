@@ -1,0 +1,40 @@
+FROM mjbright/skippbox-jupyter:latest 
+
+# Install redis-py:
+RUN pip install redis
+
+WORKDIR /root/
+
+RUN mkdir -p /root/bin /root/tmp/helm
+
+RUN curl -L -o /root/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+RUN chmod +x /root/bin/kubectl
+
+RUN curl -L -o /root/bin/mini-redis-cli https://mjbright.github.io/static/bin/mini-redis-cli
+RUN chmod +x /root/bin/mini-redis-cli
+
+RUN curl -L -o /root/tmp/helm/helm-v2.11.0-linux-arm64.tar.gz \
+  https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-arm64.tar.gz && \
+  cd /root/tmp/helm && \
+  tar zxvf helm-v2.11.0-linux-arm64.tar.gz && \
+  cp -a /root/tmp/helm/linux-arm64/helm /root/bin/helm && \
+  chmod +x /root/bin/helm && \
+  rm -rf /root/tmp/helm
+
+RUN mkdir -p /root/tmp/kubectx && \
+  curl -L -o /root/tmp/kubectx/v0.6.1.tgz https://github.com/ahmetb/kubectx/archive/v0.6.1.tar.gz && \
+  cd /root/tmp/kubectx && \
+  tar xvf v0.6.1.tgz && \
+  cp -a kubectx-0.6.1/kubectx /root/bin && \
+  cp -a kubectx-0.6.1/kubens /root/bin
+
+RUN apk --update add tmux
+
+ADD .bashrc /root/
+
+ADD tput /root/bin/tput
+RUN chmod +x /root/bin/tput
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--allow-root", "--no-browser"]
+

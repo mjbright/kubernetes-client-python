@@ -24,8 +24,13 @@ RUN() {
 }
 
 RUN docker build -t mjbright/skippbox-jupyter .
+RUN docker build -f Dockerfile.kubelab -t mjbright/kubelab .
+
 RUN docker login
 RUN docker push mjbright/skippbox-jupyter:latest
+RUN docker login
+RUN docker push mjbright/kubelab:latest
 
+echo; echo  "-- ./REDEPLOY.sh"
 ./REDEPLOY.sh
 
