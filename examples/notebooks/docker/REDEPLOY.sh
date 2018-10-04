@@ -145,8 +145,10 @@ GET_JUPYTER_TOKEN_URL() {
 
           NODE_IP="<pending>"
           start_timer
+          echo "Looping whilst EXTERNAL-IP is in pending state:"
           while [ $NODE_IP = "<pending>" ]; do
             NODE_IP=$($NS_KUBECTL get --no-headers svc jupyter | awk '{ print $4; }')
+            echo -n "."
           done
           stop_timer
           NODE_PORT=$PUBLIC_PORT
