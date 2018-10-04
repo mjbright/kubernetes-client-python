@@ -276,6 +276,12 @@ for USER in $USERS; do
         SETUP_USER $NAMESPACE $USER $DEPLOY_YAML $SERVICE_YAML
     fi
 done
+
+if [ $AUTO -ne 0 ];then
+    echo "Waiting for subprocesses to complete"
+    wait
+fi
+
 exit 0
 
 
