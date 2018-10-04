@@ -205,10 +205,30 @@ INSTALL_KUBECONFIG() {
     RUN kubectl cp tmp/${USER}.kubeconfig ${USER}/jupyter:.kube/config
 }
 
+
+SETUP_USER() {
+    NAMESPACE=$1; shift
+    USER=$1; shift
+    DEPLOY_YAML=$1; shift
+    SERVICE_YAML=$1; shift
+    
+    RESTART_JUPYTER $NAMESPACE $DEPLOY_YAML $SERVICE_YAML
+    GET_JUPYTER_TOKEN_URL tmp/${PREFIX}_$USER.token.url
+    INSTALL_KUBECONFIG
+}
+
 ## -- Args: ----------------------------------------------------------------------
+
+AUTO=0
 
 while [ ! -z "$1" ]; do
     case $1 in
+        -auto)
+            # LATER: PROMPTS=0
+            AUTO=1
+            # Create for all 'users' defined as namespaces ...
+            USERS=$(kubectl get ns | awk '/^user[0-9]/ { print $1; }')
+            ;;
         -np) PROMPTS=0;;
 
         -[0-9]*) NUM_USERS=${1#-}; break;;
@@ -232,10 +252,13 @@ done
     done
 }
 
+[ $AUTO -ne 0 ] && echo "About to run in background"
 echo "Users are <$(echo $USERS)>"
 echo "Current context is $( kubectl config current-context )"
 echo
 press "Current context is correct?"
+
+[ $AUTO -ne 0 ] && PROMPTS=0
 
 CLUSTER=$(kubectl config get-contexts | awk '/^* / { print $3; }')
 
@@ -247,9 +270,11 @@ for USER in $USERS; do
         kubectl create namespace $NAMESPACE
 
     CREATE_YAML $NAMESPACE $USER ${PREFIX}
-    RESTART_JUPYTER $NAMESPACE $DEPLOY_YAML $SERVICE_YAML
-    GET_JUPYTER_TOKEN_URL tmp/${PREFIX}_$USER.token.url
-    INSTALL_KUBECONFIG
+    if [ $AUTO -ne 0 ];then
+        SETUP_USER $NAMESPACE $USER $DEPLOY_YAML $SERVICE_YAML &
+    else
+        SETUP_USER $NAMESPACE $USER $DEPLOY_YAML $SERVICE_YAML
+    fi
 done
 exit 0
 
