@@ -31,6 +31,9 @@ RUN docker push mjbright/skippbox-jupyter:latest
 RUN docker login
 RUN docker push mjbright/kubelab:latest
 
-echo; echo  "-- ./REDEPLOY.sh"
-./REDEPLOY.sh
+## echo; echo  "-- ./REDEPLOY.sh -a"
+## ./REDEPLOY.sh -a
+
+echo
+RUN ./REDEPLOY.sh -a
 
