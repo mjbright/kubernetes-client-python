@@ -4,6 +4,8 @@ PREFIX=kubelab
 DEPLOY_TEMPLATE=${PREFIX}_deploy.yml.template
 SERVICE_TEMPLATE=${PREFIX}_service.yml.template
 
+PROMPTS=1
+
 mkdir -p tmp/
 
 BASE_PORT=8800
@@ -18,6 +20,9 @@ USERS=""
 press()
 {
     [ ! -z "$1" ] && echo "$*"
+
+    [ $PROMPTS -eq 0 ] && return 0
+
     echo "Press <return> to continue"
     read _DUMMY
     [ "$_DUMMY" = "s" ] && return 1
@@ -196,14 +201,14 @@ INSTALL_KUBECONFIG() {
     cp -a ~/tmp/$KCNAME tmp/${USER}.kubeconfig
     ls -al tmp/${USER}.kubeconfig
     RUN kubectl cp tmp/${USER}.kubeconfig ${USER}/jupyter:.kube/config
-
-    ~/tmp/kubeconfig.aks-cluster1-user1-user
 }
 
 ## -- Args: ----------------------------------------------------------------------
 
 while [ ! -z "$1" ]; do
     case $1 in
+        -np) PROMPTS=0;;
+
         -[0-9]*) NUM_USERS=${1#-}; break;;
          [0-9]*) NUM_USERS=$1;     break;;
 
