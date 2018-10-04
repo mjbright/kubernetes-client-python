@@ -30,7 +30,7 @@ spec:
         protocol: TCP
         name: http
       volumeMounts:
-        - mountPath: /root/labs
+        - mountPath: /root/ContainerOrchestration
           name: notebook-labs
         - mountPath: /root/notebook-volume
           name: notebook-volume
